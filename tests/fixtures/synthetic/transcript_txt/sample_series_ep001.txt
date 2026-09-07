@@ -1,0 +1,33 @@
+Sample Series - Episode 001
+Synthetic transcript fixture. Not derived from any real work.
+
+[00:06] Character A
+The kettle is on. Nobody move.
+
+[00:11] Character B
+That is not a plan, that is a kettle.
+
+[00:15] Char A
+Every plan
+starts as a kettle
+if you wait long enough.
+
+[00:24] Sign
+CLOSED FOR REPAIRS
+
+[00:29] A
+Fine.
+
+[0:33 Character A
+This header is malformed and must be quarantined.
+
+[00:38] Character A (whispering)
+Say nothing about the kettle.
+
+[00:44] Character C
+Who is this even.
+
+[00:50] Character A
+
+[01:02:07] Character A
+[NOTICE] this bracketed line is body text, not a header.

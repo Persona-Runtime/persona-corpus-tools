@@ -1,0 +1,24 @@
+# 합성 fixture와 테스트용 기본 persona 설정.
+# 실제 persona alias 설정은 이 레포가 아니라 private 경로에 두고 --personas 로 지정한다.
+version: 1
+
+personas:
+  - id: character_a
+    aliases:
+      - Character A
+      - Char A
+      - A
+
+  - id: character_b
+    aliases:
+      - Character B
+      - Char B
+      - B
+
+# 발화가 아닌 화자 표기. 대상 persona에서 제외되며 quarantine 대상도 아니다.
+non_dialogue_speakers:
+  - Sign
+  - Caption
+  - On-screen Text
+  - Translator Note
+  - Narration
