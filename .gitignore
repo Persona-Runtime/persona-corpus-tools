@@ -11,12 +11,14 @@ quarantine/
 source_manifest.yaml
 !tests/fixtures/**/*.jsonl
 !docs/**/source_manifest.example.yaml
+private/*
 
 # --- 로컬 환경 ---
 .env
 .env.*
 !.env.example
 .DS_Store
+feedback.md
 
 # --- Python ---
 __pycache__/

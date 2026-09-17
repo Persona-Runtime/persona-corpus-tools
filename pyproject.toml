@@ -4,11 +4,25 @@ version = "0.1.0"
 description = "Local-file transcript/script parser producing canonical persona utterance corpora"
 requires-python = ">=3.11"
 dependencies = [
+    "fastapi>=0.115",
     "PyYAML>=6.0.1",
+    "psycopg[binary]>=3.2,<4",
+    "uvicorn>=0.30",
 ]
+
+[project.optional-dependencies]
+# Parquet은 코퍼스가 커졌을 때를 위한 것이다. 지금은 JSONL로 충분하므로
+# pyarrow를 기본 설치에 넣지 않는다.
+parquet = ["pyarrow>=17"]
 
 [project.scripts]
 persona-ingest = "persona_ingestion.cli.main:main"
+persona-audit = "persona_ingestion.quality.cli:main"
+persona-smi-prepare = "persona_ingestion.smi.cli:prepare_main"
+persona-smi-review = "persona_ingestion.smi.cli:review_main"
+persona-smi-export = "persona_ingestion.smi.cli:export_main"
+persona-wiki-extract = "persona_ingestion.wiki_html.cli:main"
+persona-ingest-job = "persona_ingestion.jobs.cli:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -24,6 +38,7 @@ dev = [
     "ruff>=0.6",
     "mypy>=1.11",
     "types-PyYAML>=6.0",
+    "httpx2>=2.12.0",
 ]
 
 [tool.ruff]
@@ -40,6 +55,11 @@ strict = true
 
 [[tool.mypy.overrides]]
 module = "yaml"
+ignore_missing_imports = true
+
+# parquet extra를 설치하지 않은 기본 환경에서도 타입 검사가 통과해야 한다
+[[tool.mypy.overrides]]
+module = ["pyarrow", "pyarrow.parquet"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

@@ -1,0 +1,14 @@
+.git/
+.venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+private/
+private-data/
+raw/
+parsed/
+quarantine/
+*.pdf
+*.jsonl
+*.parquet
+feedback.md
