@@ -6,7 +6,8 @@ import argparse
 import sys
 from pathlib import Path
 
-from .export import export
+from ..reporting.markdown_export import render_speech_lines
+from .export import export, load_export
 from .prepare import prepare
 from .reviewer import create_app
 from .storage import ReviewError
@@ -55,8 +56,27 @@ def export_main(argv: list[str] | None = None) -> int:
     parser.add_argument("--annotations", type=Path, required=True)
     parser.add_argument("--personas", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument(
+        "--format",
+        choices=("jsonl", "paste"),
+        default="jsonl",
+        help=(
+            "jsonl: private structured export for review (default). "
+            "paste: single '화자: 대사' text file to paste into the web app; "
+            "--out is the file path, not a directory."
+        ),
+    )
     args = parser.parse_args(argv)
     try:
+        if args.format == "paste":
+            version, utterances = load_export(args.prepared, args.annotations, args.personas)
+            text = render_speech_lines(
+                [(u.speaker_normalized, u.text) for u in utterances]
+            )
+            args.out.parent.mkdir(parents=True, exist_ok=True)
+            args.out.write_text(text, encoding="utf-8", newline="\n")
+            print(f"wrote {len(utterances)} speech line(s) ({version}) -> {args.out}")
+            return 0
         version = export(args.prepared, args.annotations, args.personas, args.out)
     except (ReviewError, ValueError, OSError) as exc:
         print(f"error: {exc}", file=sys.stderr)

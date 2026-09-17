@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from persona_ingestion.canonical.personas import (
+from persona_corpus_tools.canonical.personas import (
     ConfigError,
     PersonaConfig,
     SpeakerKind,

@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from persona_ingestion.intake.manifest import (
+from persona_corpus_tools.intake.manifest import (
     OUTPUT_AFFECTING_FIELDS,
     IntegrityError,
     ManifestError,

@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import pytest
 
-from persona_ingestion.adapters.errors import AdapterParseError
-from persona_ingestion.adapters.shooting_script_pdf import (
+from persona_corpus_tools.adapters.errors import AdapterParseError
+from persona_corpus_tools.adapters.shooting_script_pdf import (
     PARSER_VERSION,
     parse_shooting_script_layout,
 )
-from persona_ingestion.canonical.models import SourceMeta
-from persona_ingestion.canonical.personas import PersonaConfig
+from persona_corpus_tools.canonical.models import SourceMeta
+from persona_corpus_tools.canonical.personas import PersonaConfig
 
 
 def _meta() -> SourceMeta:

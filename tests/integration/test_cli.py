@@ -6,12 +6,12 @@ from pathlib import Path
 
 import pytest
 
-from persona_ingestion.adapters.errors import AdapterParseError
-from persona_ingestion.adapters.registry import ADAPTERS
-from persona_ingestion.canonical.models import ParseResult, SourceMeta
-from persona_ingestion.canonical.personas import PersonaConfig
-from persona_ingestion.cli.main import main
-from persona_ingestion.intake.hashing import sha256_file
+from persona_corpus_tools.adapters.errors import AdapterParseError
+from persona_corpus_tools.adapters.registry import ADAPTERS
+from persona_corpus_tools.canonical.models import ParseResult, SourceMeta
+from persona_corpus_tools.canonical.personas import PersonaConfig
+from persona_corpus_tools.cli.main import main
+from persona_corpus_tools.intake.hashing import sha256_file
 
 from ..conftest import EXPECTED_DIR, MANIFEST_FIXTURE, PERSONAS, PRIVATE_ROOT
 

@@ -3,9 +3,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from persona_ingestion.canonical.versioning import compute_corpus_version
-from persona_ingestion.quality.audit import build_audit
-from persona_ingestion.quality.cli import main
+from persona_corpus_tools.canonical.versioning import compute_corpus_version
+from persona_corpus_tools.quality.audit import build_audit
+from persona_corpus_tools.quality.cli import main
 
 
 def _write_json(path: Path, value: object) -> None:

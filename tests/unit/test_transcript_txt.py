@@ -2,15 +2,15 @@ from __future__ import annotations
 
 import pytest
 
-from persona_ingestion.adapters.transcript_txt import (
+from persona_corpus_tools.adapters.transcript_txt import (
     PARSER_VERSION,
     ParseError,
     parse_transcript_bytes,
     parse_transcript_txt,
     timestamp_to_seconds,
 )
-from persona_ingestion.canonical.models import ParseResult, SourceMeta
-from persona_ingestion.canonical.personas import PersonaConfig
+from persona_corpus_tools.canonical.models import ParseResult, SourceMeta
+from persona_corpus_tools.canonical.personas import PersonaConfig
 
 from ..conftest import TRANSCRIPT_FIXTURE
 

@@ -3,11 +3,15 @@ private-data/
 raw/
 parsed/
 quarantine/
+out/
 *.jsonl
 *.parquet
 *.srt
 *.ass
 *.vtt
+*.smi
+*.pdf
+*.html
 source_manifest.yaml
 !tests/fixtures/**/*.jsonl
 !docs/**/source_manifest.example.yaml

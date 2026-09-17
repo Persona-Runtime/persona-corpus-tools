@@ -4,12 +4,12 @@ import dataclasses
 
 import pytest
 
-from persona_ingestion.adapters.registry import (
+from persona_corpus_tools.adapters.registry import (
     ADAPTERS,
     UnsupportedSourceError,
     resolve_adapter,
 )
-from persona_ingestion.intake.manifest import load_manifest
+from persona_corpus_tools.intake.manifest import load_manifest
 
 from ..conftest import MANIFEST_FIXTURE
 

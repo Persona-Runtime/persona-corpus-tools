@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from persona_ingestion.canonical.models import SourceMeta
-from persona_ingestion.canonical.personas import PersonaConfig, load_persona_config
+from persona_corpus_tools.canonical.models import SourceMeta
+from persona_corpus_tools.canonical.personas import PersonaConfig, load_persona_config
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PERSONAS = REPO_ROOT / "configs" / "personas.yaml"

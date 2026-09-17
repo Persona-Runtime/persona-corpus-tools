@@ -358,8 +358,27 @@ class _ArticleParser(HTMLParser):
                 self.parts.append(" ")
 
 
+def load_extraction(
+    input_root: Path,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any]]:
+    """Validate and parse acquired HTML, returning documents/paragraphs/report in memory.
+
+    Used by the ``--format paste`` path, which renders straight to markdown
+    instead of writing the private JSONL review artifacts.
+    """
+    return _build_extraction(input_root)
+
+
 def extract_acquisition(input_root: Path, out: Path) -> dict[str, Any]:
     """Validate all acquired HTML before writing a complete private extraction output."""
+    documents, paragraphs, report = _build_extraction(input_root)
+    _write_atomic(out, documents, paragraphs, report)
+    return report
+
+
+def _build_extraction(
+    input_root: Path,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any]]:
     sources = _load_sources(input_root)
     verified: list[tuple[AcquiredSource, bytes]] = []
     for source in sources:
@@ -420,8 +439,7 @@ def extract_acquisition(input_root: Path, out: Path) -> dict[str, Any]:
             ),
         },
     }
-    _write_atomic(out, documents, paragraphs, report)
-    return report
+    return documents, paragraphs, report
 
 
 def _load_sources(root: Path) -> list[AcquiredSource]:

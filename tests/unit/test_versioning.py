@@ -4,12 +4,12 @@ from pathlib import Path
 
 import pytest
 
-from persona_ingestion.canonical.versioning import (
+from persona_corpus_tools.canonical.versioning import (
     compute_corpus_version,
     compute_dataset_version,
     manifest_digest,
 )
-from persona_ingestion.intake.manifest import OUTPUT_AFFECTING_FIELDS, load_manifest
+from persona_corpus_tools.intake.manifest import OUTPUT_AFFECTING_FIELDS, load_manifest
 
 from ..conftest import MANIFEST_FIXTURE
 

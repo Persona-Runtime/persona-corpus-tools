@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from persona_ingestion.canonical.normalize import merge_lines, normalize_text, speaker_key
+from persona_corpus_tools.canonical.normalize import merge_lines, normalize_text, speaker_key
 
 
 def test_normalize_collapses_whitespace_and_nbsp() -> None:

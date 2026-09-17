@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from persona_ingestion.wiki_html.extractor import ExtractionError, extract_acquisition
+from persona_corpus_tools.wiki_html.extractor import ExtractionError, extract_acquisition
 
 
 def _source(source_id: str, filename: str, body: str) -> dict[str, str]:

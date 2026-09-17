@@ -2,14 +2,15 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import cast
 
 import pytest
 from fastapi.testclient import TestClient
 
-from persona_ingestion.smi.export import export
-from persona_ingestion.smi.parser import parse_smi
-from persona_ingestion.smi.reviewer import create_app
-from persona_ingestion.smi.storage import ReviewError, write_prepared
+from persona_corpus_tools.smi.export import export
+from persona_corpus_tools.smi.parser import parse_smi
+from persona_corpus_tools.smi.reviewer import create_app
+from persona_corpus_tools.smi.storage import ReviewError, write_prepared
 
 
 def _rows() -> list[dict[str, object]]:
@@ -50,7 +51,7 @@ def test_cp949_sami_parser_preserves_clear_and_bad_timing() -> None:
     assert rows[1]["is_clear"] is True
     assert rows[2]["timing_issue"] == "missing_end"
     assert rows[2]["source_line"] == 1
-    assert rows[1]["source_byte"] > rows[0]["source_byte"]
+    assert cast(int, rows[1]["source_byte"]) > cast(int, rows[0]["source_byte"])
 
 
 def test_reviewer_writes_validated_annotation_and_confines_media(tmp_path: Path) -> None:
