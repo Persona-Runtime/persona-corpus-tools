@@ -1,0 +1,20 @@
+# 합성 fixture용 manifest. private root는 tests/fixtures/synthetic 이다.
+source_id: sample-series-ep001
+character_id: character_a
+series: sample-series
+episode: "001"
+input_type: transcript_txt
+language: en
+
+# 기록만 되고 처리를 막지는 않는다. run report에 남는다.
+rights_status: synthetic
+
+acquired_at: 2026-09-07
+delete_at: 2099-12-31
+
+file: transcript_txt/sample_series_ep001.txt
+sha256: "fb417dfcc806d7cc14ad04481ebcfa143090f9eb0be544ded14b157c4b9b42e1"
+
+# 어댑터 계열 이름. 정확한 버전이 아니라 계열을 가리킨다 —
+# 파서 버전은 어댑터가 보고하며 dataset_version에 포함된다.
+parser_profile: transcript-txt

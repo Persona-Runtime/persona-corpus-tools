@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from persona_ingestion.adapters.transcript_txt import parse_transcript_txt
-from persona_ingestion.canonical.models import SourceMeta
-from persona_ingestion.canonical.personas import PersonaConfig
-from persona_ingestion.intake.hashing import sha256_file, sha256_text
-from persona_ingestion.reporting.writer import write_parse_result
+from persona_corpus_tools.adapters.transcript_txt import parse_transcript_txt
+from persona_corpus_tools.canonical.models import SourceMeta
+from persona_corpus_tools.canonical.personas import PersonaConfig
+from persona_corpus_tools.intake.hashing import sha256_file, sha256_text
+from persona_corpus_tools.reporting.writer import write_parse_result
 
 from ..conftest import TRANSCRIPT_FIXTURE
 

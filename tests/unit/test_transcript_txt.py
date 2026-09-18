@@ -2,14 +2,15 @@ from __future__ import annotations
 
 import pytest
 
-from persona_ingestion.adapters.transcript_txt import (
+from persona_corpus_tools.adapters.transcript_txt import (
     PARSER_VERSION,
     ParseError,
+    parse_transcript_bytes,
     parse_transcript_txt,
     timestamp_to_seconds,
 )
-from persona_ingestion.canonical.models import ParseResult, SourceMeta
-from persona_ingestion.canonical.personas import PersonaConfig
+from persona_corpus_tools.canonical.models import ParseResult, SourceMeta
+from persona_corpus_tools.canonical.personas import PersonaConfig
 
 from ..conftest import TRANSCRIPT_FIXTURE
 
@@ -220,3 +221,19 @@ def test_empty_input_produces_empty_result(meta: SourceMeta, personas: PersonaCo
     result = parse("", meta, personas)
     assert result.utterances == []
     assert result.quarantine == []
+
+
+def test_parse_bytes_normalizes_archive_markdown(
+    meta: SourceMeta, personas: PersonaConfig
+) -> None:
+    data = (
+        b"**[00:06] Character A**<br>&nbsp;&nbsp;First line<br>"
+        b"&nbsp;&nbsp;second line<br>**[00:10] Character B**<br>"
+        b"&nbsp;&nbsp;not the target"
+    )
+
+    result = parse_transcript_bytes(data, meta, personas, "character_a")
+
+    assert [utterance.text for utterance in result.utterances] == ["First line second line"]
+    assert result.report is not None
+    assert result.report.speakers_seen == {"Character A": 1, "Character B": 1}

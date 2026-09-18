@@ -21,9 +21,9 @@ Design rules:
 
 from __future__ import annotations
 
+import html
 import re
 from dataclasses import dataclass
-from pathlib import Path
 
 from ..canonical.models import (
     ParseReport,
@@ -34,16 +34,22 @@ from ..canonical.models import (
 )
 from ..canonical.normalize import merge_lines, normalize_text
 from ..canonical.personas import PersonaConfig, SpeakerKind
+from .errors import AdapterParseError
 
-PARSER_VERSION = "transcript-txt-v1"
+#: This adapter's own version. Bump when its behaviour changes.
+#: It is deliberately not shared with other adapters — a fix here must not
+#: change the dataset version of a corpus produced by the PDF adapter.
+PARSER_VERSION = "transcript-txt-v2"
 
 # A header candidate is '[' followed by a digit; anything else starting with
 # '[' (for example an on-screen sign) is treated as body text.
 _HEADER_CANDIDATE_RE = re.compile(r"^\s*\[\s*\d")
 _HEADER_RE = re.compile(r"^\s*\[\s*(?P<ts>\d{1,3}:\d{2}(?::\d{2})?)\s*\]\s*(?P<speaker>\S.*?)\s*$")
+_HTML_BREAK_RE = re.compile(r"<br\s*/?>", re.IGNORECASE)
+_BOLDED_HEADER_RE = re.compile(r"^(\s*)\*\*(\[\s*\d.*)\*\*(\s*)$", re.MULTILINE)
 
 
-class ParseError(ValueError):
+class ParseError(AdapterParseError):
     """Raised when the input cannot be parsed at all."""
 
 
@@ -65,6 +71,43 @@ def timestamp_to_seconds(value: str) -> int:
     return hours * 3600 + minutes * 60 + seconds
 
 
+def parse_transcript_bytes(
+    data: bytes,
+    meta: SourceMeta,
+    personas: PersonaConfig,
+    target_character_id: str,
+) -> ParseResult:
+    """Entry point used by the pipeline.
+
+    Takes the bytes that were hash-verified rather than a path, so the file is
+    read exactly once and cannot change between verification and parsing.
+    """
+    try:
+        text = data.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise ParseError(f"{meta.source_id}: not valid UTF-8 text: {exc}") from exc
+    return parse_transcript_txt(
+        _normalize_archived_markdown(text), meta, personas, target_character_id
+    )
+
+
+def _normalize_archived_markdown(text: str) -> str:
+    """Make an archive-exported transcript look like physical text lines.
+
+    SubArchivist Markdown exports use literal ``<br>`` tags for transcript
+    line breaks and wrap timestamp headers in Markdown bold markers. This is
+    presentation markup, not dialogue, so remove only those two forms before
+    block parsing. HTML entities are decoded so indentation does not leak into
+    the canonical text.
+
+    Deliberately do *not* strip general Markdown: asterisks or brackets inside
+    a dialogue line are content and must survive unchanged.
+    """
+    with_lines = _HTML_BREAK_RE.sub("\n", text)
+    without_header_bold = _BOLDED_HEADER_RE.sub(r"\1\2\3", with_lines)
+    return html.unescape(without_header_bold)
+
+
 def parse_transcript_txt(
     text: str,
     meta: SourceMeta,
@@ -82,7 +125,7 @@ def parse_transcript_txt(
     )
     result = ParseResult(report=report)
 
-    blocks, quarantine = _split_blocks(text, meta.source_id, report)
+    blocks, quarantine = _split_blocks(text, meta, report)
     result.quarantine.extend(quarantine)
 
     for block in blocks:
@@ -93,12 +136,11 @@ def parse_transcript_txt(
         if not body:
             report.bump("quarantined")
             result.quarantine.append(
-                QuarantineRecord(
-                    source_id=meta.source_id,
+                _quarantine(
+                    meta,
                     line_no=block.line_no,
                     reason="empty_body",
                     raw=f"[{block.timestamp}] {block.speaker_raw}",
-                    parser_version=PARSER_VERSION,
                 )
             )
             continue
@@ -133,6 +175,7 @@ def parse_transcript_txt(
                 text=body,
                 parser_version=PARSER_VERSION,
                 source_sha256=meta.sha256,
+                dataset_version=meta.dataset_version,
             )
         )
         report.bump("target")
@@ -140,18 +183,20 @@ def parse_transcript_txt(
     return result
 
 
-def parse_transcript_file(
-    path: Path,
-    meta: SourceMeta,
-    personas: PersonaConfig,
-    target_character_id: str,
-) -> ParseResult:
-    text = path.read_text(encoding="utf-8")
-    return parse_transcript_txt(text, meta, personas, target_character_id)
+def _quarantine(meta: SourceMeta, *, line_no: int, reason: str, raw: str) -> QuarantineRecord:
+    return QuarantineRecord(
+        source_id=meta.source_id,
+        line_no=line_no,
+        reason=reason,
+        raw=raw,
+        parser_version=PARSER_VERSION,
+        source_sha256=meta.sha256,
+        dataset_version=meta.dataset_version,
+    )
 
 
 def _split_blocks(
-    text: str, source_id: str, report: ParseReport
+    text: str, meta: SourceMeta, report: ParseReport
 ) -> tuple[list[_Block], list[QuarantineRecord]]:
     blocks: list[_Block] = []
     quarantine: list[QuarantineRecord] = []
@@ -174,13 +219,7 @@ def _split_blocks(
                 orphaned = True
                 report.bump("quarantined")
                 quarantine.append(
-                    QuarantineRecord(
-                        source_id=source_id,
-                        line_no=line_no,
-                        reason="malformed_header",
-                        raw=line.strip(),
-                        parser_version=PARSER_VERSION,
-                    )
+                    _quarantine(meta, line_no=line_no, reason="malformed_header", raw=line.strip())
                 )
                 continue
             if current is not None:
@@ -200,8 +239,8 @@ def _split_blocks(
             if line.strip():
                 report.bump("quarantined")
                 quarantine.append(
-                    QuarantineRecord(
-                        source_id=source_id,
+                    _quarantine(
+                        meta,
                         line_no=line_no,
                         reason=(
                             "orphaned_body_after_malformed_header"
@@ -209,7 +248,6 @@ def _split_blocks(
                             else "text_before_first_header"
                         ),
                         raw=line.strip(),
-                        parser_version=PARSER_VERSION,
                     )
                 )
             continue
